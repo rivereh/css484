@@ -4,9 +4,6 @@
 # Show the image with:
 # os.startfile(imageList[n].filename)
 
-
-
-
 from tkinter import *
 import math, os, sys, subprocess
 from PixInfo import PixInfo
@@ -17,7 +14,6 @@ def open_file(filename):
     else:
         opener ="open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, filename])
-
 
 # Main app.
 class ImageViewer(Frame):
