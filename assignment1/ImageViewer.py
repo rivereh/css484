@@ -8,8 +8,15 @@
 
 
 from tkinter import *
-import math, os
+import math, os, sys, subprocess
 from PixInfo import PixInfo
+
+def open_file(filename):
+    if sys.platform == "win32":
+        os.startfile(filename)
+    else:
+        opener ="open" if sys.platform == "darwin" else "xdg-open"
+        subprocess.call([opener, filename])
 
 
 # Main app.
@@ -169,7 +176,7 @@ class ImageViewer(Frame):
     # Open the picture with the default operating system image
     # viewer.
     def inspect_pic(self, filename):
-        os.startfile(filename)
+        open_file(filename)
 
 
 # Executable section.
