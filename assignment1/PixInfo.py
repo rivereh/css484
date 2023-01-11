@@ -53,26 +53,33 @@ class PixInfo:
     # image, both Intensity and Color-Code methods.
     def encode(self, pixlist):
         
-        print(pixlist)
+        # print(pixlist)
 
         # 2D array initilazation for bins, initialized
         # to zero.
-        CcBins = [0]*64
         InBins = [0]*25
+        CcBins = [0]*64
 
                     
-        for r, g, b in pixlist:
-            # Calculate the color code bin for this pixel
-            bin_num = int((r/64) * 4 + (g/64) * 2 + (b/64))
-            CcBins[bin_num] += 1
+        for pixel in pixlist:
+            r, g, b = pixel
+            
+            # intensity
+            intensity = (0.299 * r) + (0.587 * g) + (0.114 * b)
+            binNumI = int(intensity // 10) - 1
+            InBins[binNumI] += 1
 
-            # Calculate the intensity bin for this pixel
-            intensity = (r + g + b) / 3
-            bin_num = int(intensity / 64)
-            InBins[bin_num] += 1
-        
+            # Color code
+            rCC = '{0:07b}'.format(r)[:2]
+            gCC = '{0:07b}'.format(g)[:2]
+            bCC = '{0:07b}'.format(b)[:2]
+            binNumCC = int(rCC + gCC + bCC, 2) - 1
+            CcBins[binNumCC] += 1
+
         # Return the list of binary digits, one digit for each
         # pixel.
+        # print(InBins)
+        # print(CcBins)
         return CcBins, InBins
 
     # Accessor functions:
