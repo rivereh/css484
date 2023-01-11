@@ -53,6 +53,8 @@ class PixInfo:
     # image, both Intensity and Color-Code methods.
     def encode(self, pixlist):
         
+        print(pixlist)
+
         # 2D array initilazation for bins, initialized
         # to zero.
         CcBins = [0]*64
