@@ -121,12 +121,55 @@ class ImageViewer(Frame):
     # directory uses the comparison method of the passed 
     # binList
     def find_distance(self, method):
-        distances = []
+        distances = {} # image, distance
         i = self.list.curselection()[0]
+
+        imageIW, imageIH = self.imageList[i].size
+        imageIPixelCount = imageIW * imageIH
+
+        # print (imageIPixelCount)
+
+        # print(self.Image)
+
+        if method == 'inten':
+            for j, image in enumerate(self.imageList):
+                if i == j:
+                    continue
+                
+                # print(pixInfo.get_intenCode()[i])
+                # print(pixInfo.get_intenCode()[j])
+
+                imageJW, imageJH = self.imageList[j].size
+                imageJPixelCount = imageJW * imageJH
+
+                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_intenCode()[i],pixInfo.get_intenCode()[j]))
+
+                distances[image.filename] = distance
+                # print(i, j, distance)
+            
+            distances = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
+            # for x in distances:
+            #     for y in distances[x]:
+            #         print (y,':',distances[x][y])
+            # print(distances)
+
+        
+            
+            
+
+            # distance = 
+
+            # print()
+        
+            # print(image.filename)
+
+            
+
+
 
         # print(pixInfo.get_colorCode()[0])
 
-        print(pixInfo.get_colorCode()[i])
+        # print(pixInfo.get_colorCode()[i])
 
 	#your code    
     
