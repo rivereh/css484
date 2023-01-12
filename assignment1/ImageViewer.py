@@ -131,57 +131,29 @@ class ImageViewer(Frame):
 
         # print(self.Image)
 
-        if method == 'inten':
-            for j, image in enumerate(self.imageList):
-                if i == j:
-                    continue
-                
-                # print(pixInfo.get_intenCode()[i])
-                # print(pixInfo.get_intenCode()[j])
-
-                imageJW, imageJH = self.imageList[j].size
-                imageJPixelCount = imageJW * imageJH
-
-                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_intenCode()[i],pixInfo.get_intenCode()[j]))
-
-                distances[j] = distance
-                # distances[image.filename] = image
-                # print(i, j, distance)
+        for j, image in enumerate(self.imageList):
+            if i == j:
+                continue
             
-            # distances = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
-            # for x in distances:
-            #     for y in distances[x]:
-            #         print (y,':',distances[x][y])
-            
-            # for key in sorted(distances):
-            #     print(key, distances[key])
 
-            # self.update_results(sorted(distances))
-            distances = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
-            
-            # self.update_results(distances.keys())
-            # distances = sorted(distances)
+            imageJW, imageJH = self.imageList[j].size
+            imageJPixelCount = imageJW * imageJH
 
-            # for key in distanceskeys():
-            #     sortedReturn.append((self.imageList[key].filename, self.imageList[key]))
+            if method == 'inten':
+                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_intenCode()[i],pixInfo.get_intenCode()[j]) if val1 > 0 or val2 > 0)
+            elif method == 'CC':
+                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_colorCode()[i],pixInfo.get_colorCode()[j]) if val1 > 0 or val2 > 0)
 
-            # print(sortedReturn)
-            
-            self.update_results(distances)
+            distances[j] = distance
 
-            # self.update_results(distances)
-            # return distances.keys()
+        distances = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
         
-            
-
-            # distance = 
-
-            # print()
         
-            # print(image.filename)
+        self.update_results(distances)
+
 
             
-	#your code    
+  
     
     # Update the results window with the sorted results.
     def update_results(self, sortedTup):
