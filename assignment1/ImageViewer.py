@@ -7,6 +7,7 @@
 from tkinter import *
 import math, os, sys, subprocess
 from PixInfo import PixInfo
+from PIL import Image, ImageTk
 
 def open_file(filename):
     if sys.platform == "win32":
@@ -65,7 +66,6 @@ class ImageViewer(Frame):
         self.resultsScrollbar = Scrollbar(resultsFrame)
         self.resultsScrollbar.pack(side=RIGHT, fill=Y)
         
-        
         # Layout Picture Listbox.
         self.listScrollbar = Scrollbar(listFrame)
         self.listScrollbar.pack(side=RIGHT, fill=Y)
@@ -121,7 +121,7 @@ class ImageViewer(Frame):
     # directory uses the comparison method of the passed 
     # binList
     def find_distance(self, method):
-        distances = {} # image, distance
+        distances = {} # index, distance
         i = self.list.curselection()[0]
 
         imageIW, imageIH = self.imageList[i].size
@@ -144,17 +144,34 @@ class ImageViewer(Frame):
 
                 distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_intenCode()[i],pixInfo.get_intenCode()[j]))
 
-                distances[image.filename] = distance
+                distances[j] = distance
+                # distances[image.filename] = image
                 # print(i, j, distance)
             
-            distances = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
+            # distances = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
             # for x in distances:
             #     for y in distances[x]:
             #         print (y,':',distances[x][y])
-            # print(distances)
-
-        
             
+            # for key in sorted(distances):
+            #     print(key, distances[key])
+
+            # self.update_results(sorted(distances))
+            distances = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
+            
+            # self.update_results(distances.keys())
+            # distances = sorted(distances)
+
+            # for key in distanceskeys():
+            #     sortedReturn.append((self.imageList[key].filename, self.imageList[key]))
+
+            # print(sortedReturn)
+            
+            self.update_results(distances)
+
+            # self.update_results(distances)
+            # return distances.keys()
+        
             
 
             # distance = 
@@ -164,13 +181,6 @@ class ImageViewer(Frame):
             # print(image.filename)
 
             
-
-
-
-        # print(pixInfo.get_colorCode()[0])
-
-        # print(pixInfo.get_colorCode()[i])
-
 	#your code    
     
     # Update the results window with the sorted results.
@@ -178,7 +188,7 @@ class ImageViewer(Frame):
         
         cols = int(math.ceil(math.sqrt(len(sortedTup))))
         fullsize = (0, 0, (self.xmax*cols), (self.ymax*cols))
-        
+
         # Initialize the canvas with dimensions equal to the 
         # number of results.
         self.canvas.delete(ALL)
@@ -190,10 +200,14 @@ class ImageViewer(Frame):
         self.canvas.pack()
         self.resultsScrollbar.config(command=self.canvas.yview)
         
-        # your code
-        
-        # Place images on buttons, then on the canvas in order
-        # by distance.  Buttons envoke the inspect_pic method.
+        photoRemain = []
+
+        for key in sortedTup.keys():
+            im = Image.open(self.imageList[key].filename)
+            ph = ImageTk.PhotoImage(im)
+            photoRemain.append((self.imageList[key].filename, ph))
+
+
         rowPos = 0
         while photoRemain:
             
@@ -203,6 +217,8 @@ class ImageViewer(Frame):
             for (filename, img) in photoRow:
                 
                 link = Button(self.canvas, image=img)
+                link.image = img
+
                 handler = lambda f=filename: self.inspect_pic(f)
                 link.config(command=handler)
                 link.pack(side=LEFT, expand=YES)
