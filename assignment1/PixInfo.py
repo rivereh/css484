@@ -34,6 +34,7 @@ class PixInfo:
                 self.xmax = x
             if y > self.ymax:
                 self.ymax = y
+
             
             
             # Add the images to the lists.
@@ -48,6 +49,8 @@ class PixInfo:
             CcBins, InBins = self.encode(pixList)
             self.colorCode.append(CcBins)
             self.intenCode.append(InBins)
+
+        # self.ymax = 64
 
     # Bin function returns an array of bins for each 
     # image, both Intensity and Color-Code methods.

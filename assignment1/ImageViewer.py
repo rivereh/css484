@@ -172,9 +172,12 @@ class ImageViewer(Frame):
 
         for key in sortedTup.keys():
             im = Image.open(self.imageList[key].filename)
-            ph = ImageTk.PhotoImage(im)
+            imSize = im.size
+            x = int(imSize[0]/4)
+            y = int(imSize[1]/4)
+            imResize = im.resize((x, y), Image.ANTIALIAS)
+            ph = ImageTk.PhotoImage(imResize)
             photoRemain.append((self.imageList[key].filename, ph))
-
 
         rowPos = 0
         while photoRemain:
@@ -183,7 +186,7 @@ class ImageViewer(Frame):
             photoRemain = photoRemain[cols:]
             colPos = 0
             for (filename, img) in photoRow:
-                
+            
                 link = Button(self.canvas, image=img)
                 link.image = img
 
