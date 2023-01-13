@@ -2,7 +2,7 @@
 # Program to start evaluating an image in python
 
 from PIL import Image, ImageTk
-import glob, os
+import glob, os, re
 
 class PixInfo:
     def __init__(self, master):
@@ -14,12 +14,17 @@ class PixInfo:
         self.colorCode = []
         self.intenCode = []
 
-        for infile in glob.glob('images/*.jpg'):
+        # for sorting files numerically
+        infiles = glob.glob('images/*.jpg')
+        infiles = sorted(infiles, key=lambda x: int(re.findall(r'\d+', x)[0]))
+        infiles = [os.path.basename(p) for p in infiles]
+
+        for infile in infiles:
             
             # Add each image (for evaluation) into a list, 
             # and a Photo from the image (for the GUI) in a list.
-            file, ext = os.path.splitext(infile)
-            im = Image.open(infile)
+            # print(infile)
+            im = Image.open(f'images/{infile}')
 
             # Resize the image for thumbnails.
             imSize = im.size
@@ -35,8 +40,6 @@ class PixInfo:
             if y > self.ymax:
                 self.ymax = y
 
-            
-            
             # Add the images to the lists.
             self.imageList.append(im)
             self.photoList.append(photo)

@@ -7,8 +7,8 @@
 from tkinter import *
 import math, os, sys, subprocess
 from PixInfo import PixInfo
-from PIL import Image, ImageTk
 
+# for inspecting images on mac or pc
 def open_file(filename):
     if sys.platform == "win32":
         os.startfile(filename)
