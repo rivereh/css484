@@ -66,7 +66,7 @@ class PixInfo:
             
             # intensity
             intensity = (0.299 * r) + (0.587 * g) + (0.114 * b)
-            binNumI = int(intensity // 10) - 1
+            binNumI = max(0, int(intensity // 10) - 1)
             InBins[binNumI] += 1
 
             # Color code
