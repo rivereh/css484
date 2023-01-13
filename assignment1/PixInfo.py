@@ -66,14 +66,14 @@ class PixInfo:
             
             # intensity
             intensity = (0.299 * r) + (0.587 * g) + (0.114 * b)
-            binNumI = max(0, int(intensity // 10) - 1)
+            binNumI = int(intensity // 10) - 1
             InBins[binNumI] += 1
 
             # Color code
-            rCC = '{0:07b}'.format(r)[:2]
-            gCC = '{0:07b}'.format(g)[:2]
-            bCC = '{0:07b}'.format(b)[:2]
-            binNumCC = int(rCC + gCC + bCC, 2) - 1
+            rCC = '{0:08b}'.format(r)[:2]
+            gCC = '{0:08b}'.format(g)[:2]
+            bCC = '{0:08b}'.format(b)[:2]
+            binNumCC = int(rCC + gCC + bCC, 2)
             CcBins[binNumCC] += 1
 
         # Return the list of binary digits, one digit for each

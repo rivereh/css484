@@ -127,10 +127,6 @@ class ImageViewer(Frame):
         imageIW, imageIH = self.imageList[i].size
         imageIPixelCount = imageIW * imageIH
 
-        # print (imageIPixelCount)
-
-        # print(self.Image)
-
         for j, image in enumerate(self.imageList):
             if i == j:
                 continue
