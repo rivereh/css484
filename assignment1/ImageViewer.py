@@ -127,18 +127,17 @@ class ImageViewer(Frame):
         imageIW, imageIH = self.imageList[i].size
         imageIPixelCount = imageIW * imageIH
 
-        for j, image in enumerate(self.imageList):
+        for j, imageJ in enumerate(self.imageList):
             if i == j:
                 continue
-            
 
-            imageJW, imageJH = self.imageList[j].size
+            imageJW, imageJH = imageJ.size
             imageJPixelCount = imageJW * imageJH
 
             if method == 'inten':
-                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_intenCode()[i],pixInfo.get_intenCode()[j]) if val1 > 0 or val2 > 0)
+                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_intenCode()[i],pixInfo.get_intenCode()[j]))
             elif method == 'CC':
-                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_colorCode()[i],pixInfo.get_colorCode()[j]) if val1 > 0 or val2 > 0)
+                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_colorCode()[i],pixInfo.get_colorCode()[j]))
 
             distances[j] = distance
 
@@ -147,9 +146,6 @@ class ImageViewer(Frame):
         
         self.update_results(distances)
 
-
-            
-  
     
     # Update the results window with the sorted results.
     def update_results(self, sortedTup):
@@ -171,13 +167,7 @@ class ImageViewer(Frame):
         photoRemain = []
 
         for key in sortedTup.keys():
-            im = Image.open(self.imageList[key].filename)
-            imSize = im.size
-            x = int(imSize[0]/4)
-            y = int(imSize[1]/4)
-            imResize = im.resize((x, y), Image.ANTIALIAS)
-            ph = ImageTk.PhotoImage(imResize)
-            photoRemain.append((self.imageList[key].filename, ph))
+            photoRemain.append((self.imageList[key].filename, self.photoList[key]))
 
         rowPos = 0
         while photoRemain:
