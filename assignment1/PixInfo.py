@@ -58,24 +58,21 @@ class PixInfo:
     # Bin function returns an array of bins for each 
     # image, both Intensity and Color-Code methods.
     def encode(self, pixlist):
-        
-        # print(pixlist)
 
         # 2D array initilazation for bins, initialized
         # to zero.
         InBins = [0]*25
         CcBins = [0]*64
 
-                    
         for pixel in pixlist:
             r, g, b = pixel
             
-            # intensity
+            # intensity calculation
             intensity = (0.299 * r) + (0.587 * g) + (0.114 * b)
             binNumI = int(intensity // 10) - 1
             InBins[binNumI] += 1
 
-            # Color code
+            # color code calculation
             rCC = '{0:08b}'.format(r)[:2]
             gCC = '{0:08b}'.format(g)[:2]
             bCC = '{0:08b}'.format(b)[:2]
@@ -84,8 +81,6 @@ class PixInfo:
 
         # Return the list of binary digits, one digit for each
         # pixel.
-        # print(InBins)
-        # print(CcBins)
         return CcBins, InBins
 
     # Accessor functions:

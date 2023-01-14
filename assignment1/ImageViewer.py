@@ -1,9 +1,5 @@
 # ImageViewer.py
 # Program to start evaluating an image in python
-#
-# Show the image with:
-# os.startfile(imageList[n].filename)
-
 from tkinter import *
 import math, os, sys, subprocess
 from PixInfo import PixInfo
@@ -16,12 +12,9 @@ def open_file(filename):
         opener ="open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, filename])
 
-# Main app.
 class ImageViewer(Frame):
     
-    # Constructor.
     def __init__(self, master, pixInfo, resultWin):
-        
         Frame.__init__(self, master)
         self.master    = master
         self.pixInfo   = pixInfo
@@ -36,28 +29,22 @@ class ImageViewer(Frame):
         self.xmax = pixInfo.get_xmax()
         self.ymax = pixInfo.get_ymax()
         
-        
         # Create Main frame.
         mainFrame = Frame(master)
         mainFrame.pack()
-        
         
         # Create Picture chooser frame.
         listFrame = Frame(mainFrame)
         listFrame.pack(side=LEFT)
         
-        
         # Create Control frame.
         controlFrame = Frame(mainFrame)
         controlFrame.pack(side=RIGHT)
         
-        
         # Create Preview frame.
-        previewFrame = Frame(mainFrame, 
-            width=self.xmax+45, height=self.ymax)
+        previewFrame = Frame(mainFrame, width=self.xmax+45, height=self.ymax)
         previewFrame.pack_propagate(0)
         previewFrame.pack(side=RIGHT)
-        
         
         # Create Results frame.
         resultsFrame = Frame(self.resultWin)
@@ -79,8 +66,7 @@ class ImageViewer(Frame):
         self.list.activate(1)
         self.list.bind('<<ListboxSelect>>', self.update_preview)
         self.listScrollbar.config(command=self.list.yview)
-        
-        
+         
         # Layout Controls.
         button = Button(controlFrame, text="Inspect Pic", 
             fg="red", padx = 10, width=10, 
@@ -101,20 +87,16 @@ class ImageViewer(Frame):
         self.resultLbl = Label(controlFrame, text="Results:")
         self.resultLbl.grid(row=3, sticky=W)
         
-        
         # Layout Preview.
-        self.selectImg = Label(previewFrame, 
-            image=self.photoList[0])
+        self.selectImg = Label(previewFrame, image=self.photoList[0])
         self.selectImg.pack()
     
     
     # Event "listener" for listbox change.
     def update_preview(self, event):
-    
         i = self.list.curselection()[0]
         self.selectImg.configure(
             image=self.photoList[int(i)])
-    
     
     # Find the Manhattan Distance of each image and return a
     # list of distances between image i and each image in the
@@ -135,21 +117,22 @@ class ImageViewer(Frame):
             imageJPixelCount = imageJW * imageJH
 
             if method == 'inten':
-                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_intenCode()[i],pixInfo.get_intenCode()[j]))
+                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) 
+                    for val1, val2 in zip(pixInfo.get_intenCode()[i],pixInfo.get_intenCode()[j]))
+
             elif method == 'CC':
-                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount)) for val1, val2 in zip(pixInfo.get_colorCode()[i],pixInfo.get_colorCode()[j]))
+                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
+                    for val1, val2 in zip(pixInfo.get_colorCode()[i],pixInfo.get_colorCode()[j]))
 
             distances[j] = distance
 
+        # sort distances
         distances = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
-        
         
         self.update_results(distances)
 
-    
     # Update the results window with the sorted results.
     def update_results(self, sortedTup):
-        
         cols = int(math.ceil(math.sqrt(len(sortedTup))))
         fullsize = (0, 0, (self.xmax*cols), (self.ymax*cols))
 
@@ -171,12 +154,11 @@ class ImageViewer(Frame):
 
         rowPos = 0
         while photoRemain:
-            
             photoRow = photoRemain[:cols]
             photoRemain = photoRemain[cols:]
             colPos = 0
+
             for (filename, img) in photoRow:
-            
                 link = Button(self.canvas, image=img)
                 link.image = img
 
@@ -194,7 +176,6 @@ class ImageViewer(Frame):
                 
             rowPos += self.ymax
     
-    
     # Open the picture with the default operating system image
     # viewer.
     def inspect_pic(self, filename):
@@ -203,7 +184,6 @@ class ImageViewer(Frame):
 
 # Executable section.
 if __name__ == '__main__':
-
     root = Tk()
     root.title('Image Analysis Tool')
 
