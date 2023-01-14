@@ -91,7 +91,6 @@ class ImageViewer(Frame):
         self.selectImg = Label(previewFrame, image=self.photoList[0])
         self.selectImg.pack()
     
-    
     # Event "listener" for listbox change.
     def update_preview(self, event):
         i = self.list.curselection()[0]
@@ -105,14 +104,18 @@ class ImageViewer(Frame):
     def find_distance(self, method):
         distances = {} # index, distance
         i = self.list.curselection()[0]
-
+        
+        # get pixel count of selected image
         imageIW, imageIH = self.imageList[i].size
         imageIPixelCount = imageIW * imageIH
 
+        # loop through each image and get manhattan distance
         for j, imageJ in enumerate(self.imageList):
+            # skip selected image from being displayed in grid
             if i == j:
                 continue
-
+            
+            # get pixel count of image being compared
             imageJW, imageJH = imageJ.size
             imageJPixelCount = imageJW * imageJH
 
@@ -124,6 +127,7 @@ class ImageViewer(Frame):
                 distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
                     for val1, val2 in zip(pixInfo.get_colorCode()[i],pixInfo.get_colorCode()[j]))
 
+            # add computed distance to distances
             distances[j] = distance
 
         # sort distances
@@ -149,6 +153,7 @@ class ImageViewer(Frame):
         
         photoRemain = []
 
+        # retrieve images from self.photoList using keys from sortedTup
         for key in sortedTup.keys():
             photoRemain.append((self.imageList[key].filename, self.photoList[key]))
 

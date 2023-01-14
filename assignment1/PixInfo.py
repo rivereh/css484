@@ -33,7 +33,6 @@ class PixInfo:
             imResize = im.resize((x, y), Image.ANTIALIAS)
             photo = ImageTk.PhotoImage(imResize)
 
-
             # Find the max height and width of the set of pics.
             if x > self.xmax:
                 self.xmax = x
@@ -52,8 +51,6 @@ class PixInfo:
             CcBins, InBins = self.encode(pixList)
             self.colorCode.append(CcBins)
             self.intenCode.append(InBins)
-
-        # self.ymax = 64
 
     # Bin function returns an array of bins for each 
     # image, both Intensity and Color-Code methods.
