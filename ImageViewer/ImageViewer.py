@@ -6,13 +6,13 @@ import os
 import sys
 import subprocess
 from PixInfo import PixInfo
+dir = os.path.dirname(__file__)
+
 
 # for inspecting images on mac or pc
-
-
 def open_file(filename):
     if sys.platform == "win32":
-        os.startfile(filename)
+        os.startfile(os.path.join(dir, filename))
     else:
         opener = "open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, filename])
