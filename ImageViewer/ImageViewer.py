@@ -39,6 +39,9 @@ class ImageViewer(Frame):
         mainFrame = Frame(master)
         mainFrame.pack()
 
+        self.mode = None
+        self.rel = IntVar()
+
         # Create Picture chooser frame.
         listFrame = Frame(mainFrame)
         listFrame.pack(side=LEFT)
@@ -90,8 +93,14 @@ class ImageViewer(Frame):
                     command=lambda: self.find_distance(method='inten'))
         b2.grid(row=2, sticky=E)
 
-        self.resultLbl = Label(controlFrame, text="Results:")
-        self.resultLbl.grid(row=3, sticky=W)
+        b2 = Button(controlFrame, text="Intensity + Color-Code",
+                    padx=10, width=15,
+                    command=lambda: self.find_distance(method='iCC'))
+        b2.grid(row=3, sticky=E)
+
+        self.resultLbl = Checkbutton(
+            controlFrame, variable=self.rel, text="Relevance", onvalue=1, offvalue=0)
+        self.resultLbl.grid(row=4, sticky=W)
 
         # Layout Preview.
         self.selectImg = Label(previewFrame, image=self.photoList[0])
@@ -110,6 +119,11 @@ class ImageViewer(Frame):
     def find_distance(self, method):
         distances = {}  # index, distance
         i = self.list.curselection()[0]
+
+        if method == 'iCC':
+            self.mode = 'iCC'
+        else:
+            self.mode = ''
 
         # get pixel count of selected image
         imageIW, imageIH = self.imageList[i].size
@@ -130,6 +144,10 @@ class ImageViewer(Frame):
                                for val1, val2 in zip(pixInfo.get_intenCode()[i], pixInfo.get_intenCode()[j]))
 
             elif method == 'CC':
+                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
+                               for val1, val2 in zip(pixInfo.get_colorCode()[i], pixInfo.get_colorCode()[j]))
+
+            elif method == 'iCC':
                 distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
                                for val1, val2 in zip(pixInfo.get_colorCode()[i], pixInfo.get_colorCode()[j]))
 
@@ -174,12 +192,7 @@ class ImageViewer(Frame):
             for (filename, img) in photoRow:
 
                 def handler(f=filename): return self.inspect_pic(f)
-
-                relevantBtn = Checkbutton(self.canvas, text=img,
-                                          onvalue=1, offvalue=0, command=lambda v=img: display_input(v),
-                                          anchor=S)
-                relevantBtn.pack()
-                link = Button(self.canvas, image=img, anchor=N)
+                link = Button(self.canvas, image=img)
                 link.image = img
                 link.config(command=handler)
                 link.pack(side=TOP, expand=YES)
@@ -191,16 +204,21 @@ class ImageViewer(Frame):
                     anchor=NW,
                     window=link,
                     width=self.xmax,
-                    height=self.ymax - 20)
-
-                # create relevant buttons
-                self.canvas.create_window(
-                    colPos,
-                    rowPos,
-                    anchor=NW,
-                    window=relevantBtn,
-                    width=self.xmax,
                     height=self.ymax)
+
+                if self.rel.get() and self.mode == 'iCC':
+                    # create relevant buttons
+                    relevantBtn = Checkbutton(self.canvas,
+                                              onvalue=1, offvalue=0, command=lambda v=img: display_input(v))
+                    relevantBtn.pack()
+
+                    self.canvas.create_window(
+                        colPos,
+                        rowPos,
+                        anchor=NW,
+                        window=relevantBtn,
+                        width=20,
+                        height=20)
 
                 colPos += self.xmax
 
