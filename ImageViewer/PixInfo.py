@@ -5,6 +5,8 @@ from PIL import Image, ImageTk
 import glob
 import os
 import re
+import statistics
+import numpy as np
 
 
 class PixInfo:
@@ -16,6 +18,7 @@ class PixInfo:
         self.ymax = 0
         self.colorCode = []
         self.intenCode = []
+        self.iCC = []
 
         # for sorting files numerically
         infiles = glob.glob('images/*.jpg')
@@ -57,8 +60,37 @@ class PixInfo:
             self.colorCode.append(CcBins)
             self.intenCode.append(InBins)
 
+        features = []
+
+        for i in range(len(self.imageList)):
+            feature = []
+            # features for intensity
+            for j in range(len(self.intenCode[i])):
+                imageW, imageH = self.imageList[i].size
+                imagePixelCount = imageW * imageH
+                feature.append(self.intenCode[i][j] / imagePixelCount)
+            # features for color code
+            for j in range(len(self.colorCode[i])):
+                imageW, imageH = self.imageList[i].size
+                imagePixelCount = imageW * imageH
+                feature.append(self.colorCode[i][j] / imagePixelCount)
+            features.append(feature)
+
+        self.iCC = [[] for i in range(len(self.imageList))]
+
+        for i in range(len(features[0])):
+            column = [row[i] for row in features]
+            avg = sum(column) / len(column)
+            stdev = statistics.stdev(column)
+            for index, row in enumerate(self.iCC):
+                if stdev == 0:
+                    row.append(0)
+                else:
+                    row.append((features[index][i] - avg) / stdev)
+
     # Bin function returns an array of bins for each
     # image, both Intensity and Color-Code methods.
+
     def encode(self, pixlist):
 
         # 2D array initilazation for bins, initialized
@@ -103,3 +135,6 @@ class PixInfo:
 
     def get_intenCode(self):
         return self.intenCode
+
+    def get_iCC(self):
+        return self.iCC

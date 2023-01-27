@@ -149,7 +149,7 @@ class ImageViewer(Frame):
 
             elif method == 'iCC':
                 distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
-                               for val1, val2 in zip(pixInfo.get_colorCode()[i], pixInfo.get_colorCode()[j]))
+                               for val1, val2 in zip(pixInfo.get_iCC()[i], pixInfo.get_iCC()[j]))
 
             # add computed distance to distances
             distances[j] = distance

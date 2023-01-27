@@ -1,3 +1,6 @@
+import math
+import statistics
+import numpy as np
 # import glob, os
 
 # # files = glob.glob('*.py')
@@ -26,4 +29,39 @@
 
 # print (CCBins)
 
-print('{0:08b}'.format(6))
+# print('{0:08b}'.format(6))
+
+# matrix = [[1, 2, 3],
+#           [4, 5, 6],
+#           [7, 8, 9]]
+
+
+# def column(matrix, i):
+#     return [row[i] for row in matrix]
+
+
+# # print(column(matrix, 1))
+
+
+# for i in range(len(matrix)):
+#     print([row[i] for row in matrix])
+
+
+# nums = [[1, 2, 3],
+#         [4, 5, 6],
+#         [7, 8, 9]]
+# nums = np.array(nums)
+# avg = sum(nums) / len(nums)
+
+# stdev = math.sqrt((sum(pow(x - avg, 2) for x in nums) / 99))
+# stdev = statistics.stdev(nums)
+
+# print(array(nums[:, 2]))
+
+nums = [[] for i in range(3)]
+
+for index, row in enumerate(nums):
+    row.append(1)
+    row.append(2)
+
+print(nums)
