@@ -18,7 +18,8 @@ class PixInfo:
         self.ymax = 0
         self.colorCode = []
         self.intenCode = []
-        self.iCC = []
+        self.normalizedFeatures = []
+        self.weights = []
 
         # for sorting files numerically
         infiles = glob.glob('images/*.jpg')
@@ -76,17 +77,22 @@ class PixInfo:
                 feature.append(self.colorCode[i][j] / imagePixelCount)
             features.append(feature)
 
-        self.iCC = [[] for i in range(len(self.imageList))]
+        self.normalizedFeatures = [[] for i in range(len(self.imageList))]
 
         for i in range(len(features[0])):
             column = [row[i] for row in features]
             avg = sum(column) / len(column)
             stdev = statistics.stdev(column)
-            for index, row in enumerate(self.iCC):
+            for index, row in enumerate(self.normalizedFeatures):
                 if stdev == 0:
                     row.append(0)
                 else:
                     row.append((features[index][i] - avg) / stdev)
+
+        self.weights = [1/len(self.normalizedFeatures[0])
+                        for x in range(len(self.imageList))]
+
+        # print(self.weights)
 
     # Bin function returns an array of bins for each
     # image, both Intensity and Color-Code methods.
@@ -136,5 +142,5 @@ class PixInfo:
     def get_intenCode(self):
         return self.intenCode
 
-    def get_iCC(self):
-        return self.iCC
+    def get_normalizedFeatures(self):
+        return self.normalizedFeatures

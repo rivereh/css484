@@ -6,6 +6,7 @@ import os
 import sys
 import subprocess
 from PixInfo import PixInfo
+import statistics
 dir = os.path.dirname(__file__)
 
 
@@ -34,12 +35,14 @@ class ImageViewer(Frame):
         # Image size for formatting.
         self.xmax = pixInfo.get_xmax()
         self.ymax = pixInfo.get_ymax()
+        self.relevantImages = []
+        self.selectedIndex = None
+        self.normalizedWeights = []
 
         # Create Main frame.
         mainFrame = Frame(master)
         mainFrame.pack()
 
-        self.mode = None
         self.rel = IntVar()
 
         # Create Picture chooser frame.
@@ -109,35 +112,76 @@ class ImageViewer(Frame):
     # Event "listener" for listbox change.
     def update_preview(self, event):
         i = self.list.curselection()[0]
+        self.selectedIndex = i
+        self.relevantImages.clear()
         self.selectImg.configure(
             image=self.photoList[int(i)])
 
     # Find the Manhattan Distance of each image and return a
     # list of distances between image i and each image in the
     # directory uses the comparison method of the passed
-    # binList
+    # binList``
     def find_distance(self, method):
         distances = {}  # index, distance
-        i = self.list.curselection()[0]
+        i = self.selectedIndex
 
-        if method == 'iCC':
-            self.mode = 'iCC'
-        else:
-            self.mode = ''
+        # update weights
+        if len(self.relevantImages) > 0 and not (len(self.relevantImages) == 1 and self.relevantImages[0] == i):
+
+            if i not in self.relevantImages:
+                self.relevantImages.insert(0, i)
+
+            print(self.relevantImages)
+            relevantFeatures = []
+            for index in self.relevantImages:
+                relevantFeatures.append(
+                    pixInfo.get_normalizedFeatures()[index])
+            # print(relevantFeatures)
+            # print(self.relevantImages)
+            updatedWeights = []
+
+            for j in range(len(relevantFeatures[0])):
+                column = [row[i] for row in relevantFeatures]
+                # avg = sum(column) / len(column)
+                stdev = statistics.stdev(column)
+                if stdev == 0:
+                    updatedWeights.append(0)
+                else:
+                    updatedWeights.append(1 / stdev)
+
+            updatedWeightsSum = sum(updatedWeights)
+            self.normalizedWeights = []
+            for j in range(len(updatedWeights)):
+                self.normalizedWeights.append(
+                    updatedWeights[j] / updatedWeightsSum)
+
+            # update weights
+            # for i, index in enumerate(self.relevantImages):
+            #     pixInfo.weights[index] = normalizedWeights[i]
+
+            # self.relevantImages = []
 
         # get pixel count of selected image
         imageIW, imageIH = self.imageList[i].size
         imageIPixelCount = imageIW * imageIH
-
+        print(i)
         # loop through each image and get manhattan distance
         for j, imageJ in enumerate(self.imageList):
             # skip selected image from being displayed in grid
-            if i == j:
+            if self.selectedIndex == j:
                 continue
+
+            # print(self.selectedIndex, j)
 
             # get pixel count of image being compared
             imageJW, imageJH = imageJ.size
             imageJPixelCount = imageJW * imageJH
+
+            if j in self.relevantImages and j != i:
+                distance = sum(self.normalizedWeights[index] * abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
+                               for index, (val1, val2) in enumerate(zip(pixInfo.get_normalizedFeatures()[i], pixInfo.get_normalizedFeatures()[j])))
+                distances[j] = distance
+                continue
 
             if method == 'inten':
                 distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
@@ -149,10 +193,12 @@ class ImageViewer(Frame):
 
             elif method == 'iCC':
                 distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
-                               for val1, val2 in zip(pixInfo.get_iCC()[i], pixInfo.get_iCC()[j]))
+                               for val1, val2 in zip(pixInfo.get_normalizedFeatures()[i], pixInfo.get_normalizedFeatures()[j]))
 
             # add computed distance to distances
             distances[j] = distance
+
+        # print(distances)
 
         # sort distances
         distances = {k: v for k, v in sorted(
@@ -206,10 +252,12 @@ class ImageViewer(Frame):
                     width=self.xmax,
                     height=self.ymax)
 
-                if self.rel.get() and self.mode == 'iCC':
+                if self.rel.get():
                     # create relevant buttons
                     relevantBtn = Checkbutton(self.canvas,
-                                              onvalue=1, offvalue=0, command=lambda v=img: display_input(v))
+                                              onvalue=1, offvalue=0, command=lambda v=filename: self.update_weight(v))
+                    if (int("".join(filter(str.isdigit, filename))) - 1) in self.relevantImages:
+                        relevantBtn.select()
                     relevantBtn.pack()
 
                     self.canvas.create_window(
@@ -229,9 +277,13 @@ class ImageViewer(Frame):
     def inspect_pic(self, filename):
         open_file(filename)
 
-
-def display_input(img):
-    print(img)
+    def update_weight(self, filename):
+        print(filename)
+        imgNum = int("".join(filter(str.isdigit, filename))) - 1
+        if imgNum in self.relevantImages:
+            self.relevantImages.remove(imgNum)
+        else:
+            self.relevantImages.append(imgNum)
 
 
 # Executable section.
