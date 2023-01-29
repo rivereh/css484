@@ -19,7 +19,6 @@ class PixInfo:
         self.colorCode = []
         self.intenCode = []
         self.normalizedFeatures = []
-        self.weights = []
 
         # for sorting files numerically
         infiles = glob.glob('images/*.jpg')
@@ -88,11 +87,6 @@ class PixInfo:
                     row.append(0)
                 else:
                     row.append((features[index][i] - avg) / stdev)
-
-        self.weights = [1/len(self.normalizedFeatures[0])
-                        for x in range(len(self.imageList))]
-
-        # print(self.weights)
 
     # Bin function returns an array of bins for each
     # image, both Intensity and Color-Code methods.

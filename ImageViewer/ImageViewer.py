@@ -114,6 +114,7 @@ class ImageViewer(Frame):
         i = self.list.curselection()[0]
         self.selectedIndex = i
         self.relevantImages.clear()
+        self.normalizedWeights.clear()
         self.selectImg.configure(
             image=self.photoList[int(i)])
 
@@ -125,24 +126,21 @@ class ImageViewer(Frame):
         distances = {}  # index, distance
         i = self.selectedIndex
 
-        # update weights
+        # update weights if there are relevant images selected
         if len(self.relevantImages) > 0 and not (len(self.relevantImages) == 1 and self.relevantImages[0] == i):
 
             if i not in self.relevantImages:
                 self.relevantImages.insert(0, i)
 
-            print(self.relevantImages)
             relevantFeatures = []
             for index in self.relevantImages:
                 relevantFeatures.append(
                     pixInfo.get_normalizedFeatures()[index])
-            # print(relevantFeatures)
-            # print(self.relevantImages)
+
             updatedWeights = []
 
             for j in range(len(relevantFeatures[0])):
-                column = [row[i] for row in relevantFeatures]
-                # avg = sum(column) / len(column)
+                column = [row[j] for row in relevantFeatures]
                 stdev = statistics.stdev(column)
                 if stdev == 0:
                     updatedWeights.append(0)
@@ -150,21 +148,15 @@ class ImageViewer(Frame):
                     updatedWeights.append(1 / stdev)
 
             updatedWeightsSum = sum(updatedWeights)
-            self.normalizedWeights = []
+            self.normalizedWeights.clear()
             for j in range(len(updatedWeights)):
                 self.normalizedWeights.append(
                     updatedWeights[j] / updatedWeightsSum)
 
-            # update weights
-            # for i, index in enumerate(self.relevantImages):
-            #     pixInfo.weights[index] = normalizedWeights[i]
-
-            # self.relevantImages = []
-
         # get pixel count of selected image
         imageIW, imageIH = self.imageList[i].size
         imageIPixelCount = imageIW * imageIH
-        print(i)
+        # print(i)
         # loop through each image and get manhattan distance
         for j, imageJ in enumerate(self.imageList):
             # skip selected image from being displayed in grid
@@ -177,12 +169,6 @@ class ImageViewer(Frame):
             imageJW, imageJH = imageJ.size
             imageJPixelCount = imageJW * imageJH
 
-            if j in self.relevantImages and j != i:
-                distance = sum(self.normalizedWeights[index] * abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
-                               for index, (val1, val2) in enumerate(zip(pixInfo.get_normalizedFeatures()[i], pixInfo.get_normalizedFeatures()[j])))
-                distances[j] = distance
-                continue
-
             if method == 'inten':
                 distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
                                for val1, val2 in zip(pixInfo.get_intenCode()[i], pixInfo.get_intenCode()[j]))
@@ -192,8 +178,12 @@ class ImageViewer(Frame):
                                for val1, val2 in zip(pixInfo.get_colorCode()[i], pixInfo.get_colorCode()[j]))
 
             elif method == 'iCC':
-                distance = sum(abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
-                               for val1, val2 in zip(pixInfo.get_normalizedFeatures()[i], pixInfo.get_normalizedFeatures()[j]))
+                if len(self.normalizedWeights) > 0:
+                    distance = sum(self.normalizedWeights[index] * abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
+                                   for index, (val1, val2) in enumerate(zip(pixInfo.get_normalizedFeatures()[i], pixInfo.get_normalizedFeatures()[j])))
+                else:
+                    distance = sum((1/89) * abs((val1/imageIPixelCount) - (val2/imageJPixelCount))
+                                   for index, (val1, val2) in enumerate(zip(pixInfo.get_normalizedFeatures()[i], pixInfo.get_normalizedFeatures()[j])))
 
             # add computed distance to distances
             distances[j] = distance
