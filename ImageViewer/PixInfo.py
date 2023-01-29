@@ -78,13 +78,23 @@ class PixInfo:
 
         self.normalizedFeatures = [[] for i in range(len(self.imageList))]
 
+        stdevs = []
+
+        for i in range(len(features[0])):
+            column = [row[i] for row in features]
+            stdev = statistics.stdev(column)
+            stdevs.append(stdev)
+
         for i in range(len(features[0])):
             column = [row[i] for row in features]
             avg = sum(column) / len(column)
-            stdev = statistics.stdev(column)
+            stdev = stdevs[i]
+            mean = statistics.mean(column)
             for index, row in enumerate(self.normalizedFeatures):
-                if stdev == 0:
+                if stdev == 0 and mean == 0:
                     row.append(0)
+                elif stdev == 0:
+                    row.append(1 / (0.5 * min(x for x in stdevs if x != 0)))
                 else:
                     row.append((features[index][i] - avg) / stdev)
 

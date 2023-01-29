@@ -139,11 +139,22 @@ class ImageViewer(Frame):
 
             updatedWeights = []
 
+            stdevs = []
+
             for j in range(len(relevantFeatures[0])):
                 column = [row[j] for row in relevantFeatures]
                 stdev = statistics.stdev(column)
-                if stdev == 0:
+                stdevs.append(stdev)
+
+            for j in range(len(relevantFeatures[0])):
+                column = [row[j] for row in relevantFeatures]
+                stdev = stdevs[j]
+                mean = statistics.mean(column)
+                if stdev == 0 and mean == 0:
                     updatedWeights.append(0)
+                elif stdev == 0:
+                    updatedWeights.append(
+                        1 / (0.5 * min(x for x in stdevs if x != 0)))
                 else:
                     updatedWeights.append(1 / stdev)
 
@@ -268,7 +279,7 @@ class ImageViewer(Frame):
         open_file(filename)
 
     def update_weight(self, filename):
-        print(filename)
+        # print(filename)
         imgNum = int("".join(filter(str.isdigit, filename))) - 1
         if imgNum in self.relevantImages:
             self.relevantImages.remove(imgNum)

@@ -58,10 +58,69 @@ import numpy as np
 
 # print(array(nums[:, 2]))
 
-nums = [[] for i in range(3)]
+# nums = [[] for i in range(3)]
 
-for index, row in enumerate(nums):
-    row.append(1)
-    row.append(2)
+# for index, row in enumerate(nums):
+#     row.append(1)
+#     row.append(2)
 
-print(nums)
+# print(nums)
+
+
+bins = [[20, 30, 30, 20, 20, 20, 20],
+        [1, 5, 4, 0, 0, 5, 5],
+        [2, 2, 1, 2, 2, 1, 0],
+        [4, 4, 2, 2, 2, 2, 4]]
+
+sizes = [80, 10, 5, 10]
+
+features = []
+
+for binIndex in range(len(bins)):
+    row = []
+    for element in range(len(bins[binIndex])):
+        row.append(bins[binIndex][element] / sizes[binIndex])
+    features.append(row)
+
+avgs = []
+stdevs = []
+
+normalizedFeatures = [[] for i in range(4)]
+
+for i in range(len(features[0])):
+    column = [row[i] for row in features]
+    avg = sum(column) / len(column)
+    avgs.append(avg)
+    stdev = statistics.stdev(column)
+    stdevs.append(stdev)
+    for index, row in enumerate(normalizedFeatures):
+        if stdev == 0:
+            row.append(0)
+        else:
+            row.append((features[index][i] - avg) / stdev)
+
+relevantFeatures = []
+relevantFeatures.append(normalizedFeatures[0])
+relevantFeatures.append(normalizedFeatures[1])
+
+updatedWeights = []
+normalizedWeights = []
+
+for j in range(len(relevantFeatures[0])):
+    column = [row[j] for row in relevantFeatures]
+    stdev = statistics.stdev(column)
+    if stdev == 0:
+        updatedWeights.append(0)
+    else:
+        updatedWeights.append(1 / stdev)
+
+
+updatedWeightsSum = sum(updatedWeights)
+for j in range(len(updatedWeights)):
+    normalizedWeights.append(updatedWeights[j] / updatedWeightsSum)
+
+print(normalizedWeights)
+
+# print(avgs)
+# print(stdevs)
+# print(normalizedFeatures)
