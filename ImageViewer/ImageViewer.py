@@ -1,3 +1,7 @@
+# River Hill
+# CSS 484 A
+# Winter 2023
+
 # ImageViewer.py
 # Program to start evaluating an image in python
 from tkinter import *
@@ -126,26 +130,34 @@ class ImageViewer(Frame):
         distances = {}  # index, distance
         i = self.selectedIndex
 
-        # update weights if there are relevant images selected
-        if len(self.relevantImages) > 0 and not (len(self.relevantImages) == 1 and self.relevantImages[0] == i):
+        # ensure results are restored to normal if nothing is checked
+        if len(self.relevantImages) == 1 and self.relevantImages[0] == i:
+            self.relevantImages.clear()
+            self.normalizedWeights.clear()
 
+        # update weights if there are relevant images selected
+        if len(self.relevantImages) > 0:
+
+            # add first image for comparison
             if i not in self.relevantImages:
                 self.relevantImages.insert(0, i)
 
+            # create array of relevant image features
             relevantFeatures = []
             for index in self.relevantImages:
                 relevantFeatures.append(
                     pixInfo.get_normalizedFeatures()[index])
 
             updatedWeights = []
-
             stdevs = []
 
+            # create array of each columns stdevs
             for j in range(len(relevantFeatures[0])):
                 column = [row[j] for row in relevantFeatures]
                 stdev = statistics.stdev(column)
                 stdevs.append(stdev)
 
+            # find updated weight of column
             for j in range(len(relevantFeatures[0])):
                 column = [row[j] for row in relevantFeatures]
                 stdev = stdevs[j]
@@ -158,6 +170,7 @@ class ImageViewer(Frame):
                 else:
                     updatedWeights.append(1 / stdev)
 
+            # create array of normalized weights
             updatedWeightsSum = sum(updatedWeights)
             self.normalizedWeights.clear()
             for j in range(len(updatedWeights)):
@@ -173,8 +186,6 @@ class ImageViewer(Frame):
             # skip selected image from being displayed in grid
             if self.selectedIndex == j:
                 continue
-
-            # print(self.selectedIndex, j)
 
             # get pixel count of image being compared
             imageJW, imageJH = imageJ.size
@@ -199,12 +210,11 @@ class ImageViewer(Frame):
             # add computed distance to distances
             distances[j] = distance
 
-        # print(distances)
-
         # sort distances
         distances = {k: v for k, v in sorted(
             distances.items(), key=lambda item: item[1])}
 
+        # update results with new sorted distances
         self.update_results(distances)
 
     # Update the results window with the sorted results.

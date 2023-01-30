@@ -1,3 +1,7 @@
+# River Hill
+# CSS 484 A
+# Winter 2023
+
 # PixInfo.py
 # Program to start evaluating an image in python
 
@@ -15,7 +19,7 @@ class PixInfo:
         self.imageList = []
         self.photoList = []
         self.xmax = 0
-        self.ymax = 0
+        self.ymax = 96
         self.colorCode = []
         self.intenCode = []
         self.normalizedFeatures = []
@@ -42,14 +46,10 @@ class PixInfo:
             # Find the max height and width of the set of pics.
             if x > self.xmax:
                 self.xmax = x
-            if y > self.ymax:
-                self.ymax = y
 
             # Add the images to the lists.
             self.imageList.append(im)
             self.photoList.append(photo)
-
-        self.ymax = 96
 
         # Create a list of pixel data for each image and add it
         # to a list.
@@ -60,6 +60,10 @@ class PixInfo:
             self.colorCode.append(CcBins)
             self.intenCode.append(InBins)
 
+        self.normalizedFeatures = self.createNormalizedFeatures()
+
+    def createNormalizedFeatures(self):
+        normalizedFeatures = [[] for i in range(len(self.imageList))]
         features = []
 
         for i in range(len(self.imageList)):
@@ -76,27 +80,28 @@ class PixInfo:
                 feature.append(self.colorCode[i][j] / imagePixelCount)
             features.append(feature)
 
-        self.normalizedFeatures = [[] for i in range(len(self.imageList))]
-
+        # create array for stdevs
         stdevs = []
-
         for i in range(len(features[0])):
             column = [row[i] for row in features]
             stdev = statistics.stdev(column)
             stdevs.append(stdev)
 
+        # create normalized features
         for i in range(len(features[0])):
             column = [row[i] for row in features]
             avg = sum(column) / len(column)
             stdev = stdevs[i]
             mean = statistics.mean(column)
-            for index, row in enumerate(self.normalizedFeatures):
+            for index, row in enumerate(normalizedFeatures):
                 if stdev == 0 and mean == 0:
                     row.append(0)
                 elif stdev == 0:
                     row.append(1 / (0.5 * min(x for x in stdevs if x != 0)))
                 else:
                     row.append((features[index][i] - avg) / stdev)
+
+        return normalizedFeatures
 
     # Bin function returns an array of bins for each
     # image, both Intensity and Color-Code methods.
