@@ -70,6 +70,8 @@ FSet = []
 Fs = []
 Cs = []
 
+sets = []
+
 
 mean = statistics.mean(SD)
 std = statistics.stdev(SD)
@@ -88,6 +90,7 @@ for i in range(len(SD)):
         cItem.append(1000 + i + 1)
         cItem.append(1000 + i + 2)
         CSet.append(cItem)
+        sets.append(cItem)
 
     if Ts <= SD[i] < Tb and Fs_candi is None:
         Fs_candi = i
@@ -108,6 +111,7 @@ for i in range(len(SD)):
                 fItem.append(Fs_candi + 1001)
                 fItem.append(1000 + i - 1)
                 FSet.append(fItem)
+                sets.append(fItem)
 
             Fs_candi = None
             tCount = 0
@@ -123,16 +127,27 @@ print("\nFSet Values:")
 for f in FSet:
     print(f'{f[0]}, {f[1]}')
 
+print("\nAll Values:")
+for s in sets:
+    print(f'{s[0]}, {s[1]}')
 
-def playShot(start, end):
+
+def playShot(index):
     cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
-    cap.set(1, start)
-
+    if index == 0:
+        cap.set(1, 1000)
+        count = 1000
+        end = sets[index][0]
+    elif index == len(sets):
+        end = 3999
+    else:
+        cap.set(1, sets[index - 1][1])
+        count = sets[index - 1][1]
+        end = sets[index][0]
+    
     # Check if camera opened successfully
     if (cap.isOpened() == False):
         print("Error opening video file")
-
-    count = start
 
     # Read until video is completed
     while (cap.isOpened()):
@@ -142,7 +157,7 @@ def playShot(start, end):
         if ret == True and count < end:
             # Display the resulting frame
             cv2.imshow('Frame', frame)
-            time.sleep(0.1)
+            # time.sleep(0.1)
             count += 1
         # Press Q on keyboard to exit
             if cv2.waitKey(25) & 0xFF == ord('q'):
@@ -183,10 +198,10 @@ cols = 5
 col = 0
 row = 0
 
-for i in range(len(CSet)):
+for i in range(len(sets)):
 
     cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
-    cap.set(1, CSet[i][0])
+    cap.set(1, sets[i][0])
     ret, image = cap.read()
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     pil_im = Image.fromarray(image)
@@ -198,10 +213,8 @@ for i in range(len(CSet)):
     pil_im2 = ImageTk.PhotoImage(imResize)
 
     myButton = Button(root, image=pil_im2,
-                      command=lambda v=CSet[i][0], k=CSet[i][1]: playShot(v, k))
+                      command=lambda index=i: playShot(index))
     myButton.image = pil_im2
-
-    # make it so the buttons show up in two columns
 
     myButton.grid(row=row, column=col)
 
@@ -211,32 +224,5 @@ for i in range(len(CSet)):
         row += 1
 
     # myButton.pack()
-
-for i in range(len(FSet)):
-
-    cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
-    cap.set(1, FSet[i][0])
-    ret, image = cap.read()
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    pil_im = Image.fromarray(image)
-
-    imSize = pil_im.size
-    x = int(imSize[0]/3)
-    y = int(imSize[1]/3)
-    imResize = pil_im.resize((x, y), Image.Resampling.LANCZOS)
-    pil_im2 = ImageTk.PhotoImage(imResize)
-
-    myButton = Button(root, image=pil_im2,
-                      command=lambda v=FSet[i][0], k=FSet[i][1]: playShot(v, k))
-    myButton.image = pil_im2
-
-    # make it so the buttons show up in two columns
-
-    myButton.grid(row=row, column=col)
-
-    col += 1
-    if col == cols:
-        col = 0
-        row += 1
 
 root.mainloop()
