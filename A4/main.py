@@ -5,6 +5,7 @@ import statistics
 import time
 
 root = Tk()
+root.title('Video Shot Boundary Detection')
 inBins = []
 
 
@@ -173,9 +174,38 @@ def playShot(start, end):
 
 # root.mainloop()
 
-cols = 4
+cols = 5
 col = 0
 row = 0
+
+for i in range(len(CSet)):
+
+    cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
+    cap.set(1, CSet[i][0])
+    ret, image = cap.read()
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    pil_im = Image.fromarray(image)
+
+    imSize = pil_im.size
+    x = int(imSize[0]/4)
+    y = int(imSize[1]/4)
+    imResize = pil_im.resize((x, y), Image.ANTIALIAS)
+    pil_im2 = ImageTk.PhotoImage(imResize)
+
+    myButton = Button(root, image=pil_im2,
+                      command=lambda v=CSet[i][0], k=CSet[i][1]: playShot(v, k))
+    myButton.image = pil_im2
+
+    # make it so the buttons show up in two columns
+
+    myButton.grid(row=row, column=col)
+
+    col += 1
+    if col == cols:
+        col = 0
+        row += 1
+
+    # myButton.pack()
 
 for i in range(len(FSet)):
 
@@ -203,7 +233,5 @@ for i in range(len(FSet)):
     if col == cols:
         col = 0
         row += 1
-
-    # myButton.pack()
 
 root.mainloop()
