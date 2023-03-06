@@ -35,7 +35,7 @@ def generateFrames(path):
         imSize = pil_im.size
         x = int(imSize[0]/4)
         y = int(imSize[1]/4)
-        imResize = pil_im.resize((x, y), Image.ANTIALIAS)
+        imResize = pil_im.resize((x, y), Image.Resampling.LANCZOS)
         pixList = list(imResize.getdata())
 
         bins = [0]*25
@@ -115,8 +115,13 @@ for i in range(len(SD)):
         tCount = 0
 
 
-print(CSet)
-print(FSet)
+print("\nCSet Values:")
+for c in CSet:
+    print(f'{c[0]}, {c[1]}')
+
+print("\nFSet Values:")
+for f in FSet:
+    print(f'{f[0]}, {f[1]}')
 
 
 def playShot(start, end):
@@ -187,9 +192,9 @@ for i in range(len(CSet)):
     pil_im = Image.fromarray(image)
 
     imSize = pil_im.size
-    x = int(imSize[0]/4)
-    y = int(imSize[1]/4)
-    imResize = pil_im.resize((x, y), Image.ANTIALIAS)
+    x = int(imSize[0]/3)
+    y = int(imSize[1]/3)
+    imResize = pil_im.resize((x, y), Image.Resampling.LANCZOS)
     pil_im2 = ImageTk.PhotoImage(imResize)
 
     myButton = Button(root, image=pil_im2,
@@ -216,9 +221,9 @@ for i in range(len(FSet)):
     pil_im = Image.fromarray(image)
 
     imSize = pil_im.size
-    x = int(imSize[0]/4)
-    y = int(imSize[1]/4)
-    imResize = pil_im.resize((x, y), Image.ANTIALIAS)
+    x = int(imSize[0]/3)
+    y = int(imSize[1]/3)
+    imResize = pil_im.resize((x, y), Image.Resampling.LANCZOS)
     pil_im2 = ImageTk.PhotoImage(imResize)
 
     myButton = Button(root, image=pil_im2,
