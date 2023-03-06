@@ -173,7 +173,12 @@ def playShot(start, end):
 
 # root.mainloop()
 
+cols = 4
+col = 0
+row = 0
+
 for i in range(len(FSet)):
+
     cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
     cap.set(1, FSet[i][0])
     ret, image = cap.read()
@@ -181,14 +186,24 @@ for i in range(len(FSet)):
     pil_im = Image.fromarray(image)
 
     imSize = pil_im.size
-    x = int(imSize[0]/2)
-    y = int(imSize[1]/2)
+    x = int(imSize[0]/4)
+    y = int(imSize[1]/4)
     imResize = pil_im.resize((x, y), Image.ANTIALIAS)
     pil_im2 = ImageTk.PhotoImage(imResize)
 
     myButton = Button(root, image=pil_im2,
                       command=lambda v=FSet[i][0], k=FSet[i][1]: playShot(v, k))
     myButton.image = pil_im2
-    myButton.pack()
+
+    # make it so the buttons show up in two columns
+
+    myButton.grid(row=row, column=col)
+
+    col += 1
+    if col == cols:
+        col = 0
+        row += 1
+
+    # myButton.pack()
 
 root.mainloop()
