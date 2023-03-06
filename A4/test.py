@@ -1,61 +1,62 @@
 import cv2
-# video_name is the video being called
-# cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
-# cap.set(1, 1575)  # Where frame_no is the frame you want
-# ret, frame = cap.read()  # Read the frame
-# cv2.imshow('window_name', frame)  # show frame on window
+# # video_name is the video being called
+# # cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
+# # cap.set(1, 1575)  # Where frame_no is the frame you want
+# # ret, frame = cap.read()  # Read the frame
+# # cv2.imshow('window_name', frame)  # show frame on window
 
 
-# while True:
-#     ch = 0xFF & cv2.waitKey(1)  # Wait for a second
-#     if ch == 27:
-#         break
+# # while True:
+# #     ch = 0xFF & cv2.waitKey(1)  # Wait for a second
+# #     if ch == 27:
+# #         break
 
 
-# apple = [1, 2, 3, 4, 5, 6]
+# # apple = [1, 2, 3, 4, 5, 6]
 
-# # print(apple[2:4])
-
-
-# for num in apple[2:4]:
-#     print(num)
+# # # print(apple[2:4])
 
 
-# cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
-# cap.set(1, 1575)  # Where frame_no is the frame you want
-
-# # Used as counter variable
-# frame = 0
-
-# # checks whether frames were extracted
-# success = 1
+# # for num in apple[2:4]:
+# #     print(num)
 
 
-# while success and frame <= 3999:
+# # cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
+# # cap.set(1, 1575)  # Where frame_no is the frame you want
 
-#     # vidObj object calls read
-#     # function extract frames
-#     success, image = cap.read()
-#     cv2.imshow('window_name', frame)  # show frame on window
-#     frame += 1
+# # # Used as counter variable
+# # frame = 0
 
-
-# while True:
-#     ch = 0xFF & cv2.waitKey(1)  # Wait for a second
-#     if ch == 27:
-#         break
+# # # checks whether frames were extracted
+# # success = 1
 
 
-cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
-cap.set(1, 90)
+# # while success and frame <= 3999:
 
-# Check if camera opened successfully
-if (cap.isOpened() == False):
-    print("Error opening video file")
+# #     # vidObj object calls read
+# #     # function extract frames
+# #     success, image = cap.read()
+# #     cv2.imshow('window_name', frame)  # show frame on window
+# #     frame += 1
+
+
+# # while True:
+# #     ch = 0xFF & cv2.waitKey(1)  # Wait for a second
+# #     if ch == 27:
+# #         break
+
+
+#
+# cap.set(1, 90)
+
+# # Check if camera opened successfully
+# if (cap.isOpened() == False):
+#     print("Error opening video file")
 
 count = 90
 
 # Read until video is completed
+cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
 while (cap.isOpened()):
 
     # Capture frame-by-frame
@@ -75,7 +76,17 @@ while (cap.isOpened()):
 
 # When everything done, release
 # the video capture object
-cap.release()
+# cap.release()
 
-# Closes all the frames
-cv2.destroyAllWindows()
+# # Closes all the frames
+# cv2.destroyAllWindows()
+
+
+# from tkinter import *
+# root = Tk()
+
+# for i in range(10):
+#     myButton = Button(root, text="Click me!")
+#     myButton.pack()
+
+# root.mainloop()

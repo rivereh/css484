@@ -1,8 +1,10 @@
+from tkinter import *
 from PIL import Image, ImageTk
 import cv2
 import statistics
 import time
 
+root = Tk()
 inBins = []
 
 
@@ -152,4 +154,41 @@ def playShot(start, end):
     cv2.destroyAllWindows()
 
 
-playShot(FSet[1][0], FSet[1][1])
+# playShot(FSet[1][0], FSet[1][1])
+
+# cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
+# cap.set(1, FSet[5][0])
+# ret, image = cap.read()
+# image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+# pil_im = Image.fromarray(image)
+
+# imSize = pil_im.size
+# x = int(imSize[0]/2)
+# y = int(imSize[1]/2)
+# imResize = pil_im.resize((x, y), Image.ANTIALIAS)
+# pil_im2 = ImageTk.PhotoImage(imResize)
+
+# myButton = Button(root, image=pil_im2)
+# myButton.pack()
+
+# root.mainloop()
+
+for i in range(len(FSet)):
+    cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
+    cap.set(1, FSet[i][0])
+    ret, image = cap.read()
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    pil_im = Image.fromarray(image)
+
+    imSize = pil_im.size
+    x = int(imSize[0]/2)
+    y = int(imSize[1]/2)
+    imResize = pil_im.resize((x, y), Image.ANTIALIAS)
+    pil_im2 = ImageTk.PhotoImage(imResize)
+
+    myButton = Button(root, image=pil_im2,
+                      command=lambda v=FSet[i][0], k=FSet[i][1]: playShot(v, k))
+    myButton.image = pil_im2
+    myButton.pack()
+
+root.mainloop()
