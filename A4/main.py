@@ -3,41 +3,34 @@ from PIL import Image, ImageTk
 import cv2
 import statistics
 import time
+import pickle
 
 root = Tk()
 root.title('Video Shot Boundary Detection')
 inBins = []
 
+USE_FEATURES_TXT = True
 
-def generateFrames(path):
 
-    # Path to video file
+def generateInBins(path):
+    # load video and set first frame to #1000
     cap = cv2.VideoCapture(path)
     cap.set(1, 1000)
 
-    # Used as counter variable
     frame = 0
-
-    # checks whether frames were extracted
     success = 1
 
+    # loop through each from 1000 to 4999 extract features
+    # into inBins
     while success and frame <= 3999:
-
-        # vidObj object calls read
-        # function extract frames
         success, image = cap.read()
 
         print(f'Processing frame {frame} of 3999')
-        # Saves the frames with frame-frame
-        # cv2.imwrite(f'frames/frame{frame}.jpg', image)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pil_im = Image.fromarray(image)
-        imSize = pil_im.size
-        x = int(imSize[0]/4)
-        y = int(imSize[1]/4)
-        imResize = pil_im.resize((x, y), Image.Resampling.LANCZOS)
-        pixList = list(imResize.getdata())
+        pixList = list(pil_im.getdata())
 
+        # feature bins for single image
         bins = [0]*25
 
         for pixel in pixList:
@@ -50,11 +43,19 @@ def generateFrames(path):
 
         frame += 1
 
+    with open('features.txt', 'wb') as file:
+        pickle.dump(inBins, file)
 
-generateFrames('20020924_juve_dk_02a.mpeg')
 
+if USE_FEATURES_TXT:
+    with open('features.txt', 'rb') as file:
+        inBins = pickle.load(file)
+else:
+    generateInBins('20020924_juve_dk_02a.mpeg')
+
+
+# create list of distances between each frame
 SD = [0] * 3999
-
 
 for i in range(3999):
     distance = sum(abs(val1 - val2)
@@ -63,22 +64,22 @@ for i in range(3999):
     SD[i] = distance
 
 
-# print(distances)
-
+# create list of shot boundaries
 CSet = []
 FSet = []
 Fs = []
 Cs = []
-
 sets = []
 
-
-mean = statistics.mean(SD)
+# calculate mean and standard deviation
+mean = sum(SD) / len(SD)
 std = statistics.stdev(SD)
 
+# calculate Tb and Ts
 Tb = mean + std * 11
 Ts = mean * 2
 
+# find shot boundaries
 Fs_candi = None
 Tor = 2
 tCount = 0
@@ -94,14 +95,12 @@ for i in range(len(SD)):
 
     if Ts <= SD[i] < Tb and Fs_candi is None:
         Fs_candi = i
-        # Fs.append(Fs_candi)
     if Fs_candi is not None and i in Cs:
         Fs_candi = None
         tCount = 0
     elif Fs_candi is not None and SD[i] < Ts:
         tCount += 1
         if tCount == Tor:
-            # Fs.append(Fs_candi + 1)
             sum = 0
             for num in SD[Fs_candi:i-1]:
                 sum += num
@@ -121,79 +120,50 @@ for i in range(len(SD)):
 
 print("\nCSet Values:")
 for c in CSet:
-    print(f'{c[0]}, {c[1]}')
+    print(f'{c[0] - 1}, {c[1] - 1}')
 
 print("\nFSet Values:")
 for f in FSet:
     print(f'{f[0]}, {f[1]}')
 
-print("\nAll Values:")
-for s in sets:
-    print(f'{s[0]}, {s[1]}')
+# print values
+print(f'\nMean: {mean}')
+print(f'Stdev: {std}')
+print(f'Tb: {Tb}')
+print(f'Ts: {Ts}')
 
 
 def playShot(index):
     cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
-    if index == 0:
-        cap.set(1, 1000)
-        count = 1000
-        end = sets[index][0]
-    elif index == len(sets):
-        end = 3999
+
+    if index == len(sets) - 1:
+        cap.set(1, sets[index][0])
+        count = sets[index][0]
+        end = 4999
     else:
-        cap.set(1, sets[index - 1][1])
-        count = sets[index - 1][1]
-        end = sets[index][0]
-    
-    # Check if camera opened successfully
+        cap.set(1, sets[index][0])
+        count = sets[index][0]
+        end = sets[index + 1][0] - 1
+
     if (cap.isOpened() == False):
         print("Error opening video file")
 
-    # Read until video is completed
     while (cap.isOpened()):
 
-        # Capture frame-by-frame
         ret, frame = cap.read()
         if ret == True and count < end:
-            # Display the resulting frame
             cv2.imshow('Frame', frame)
-            # time.sleep(0.1)
             count += 1
-        # Press Q on keyboard to exit
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 break
-
-        # Break the loop
         else:
             break
 
-    # When everything done, release
-    # the video capture object
     cap.release()
-
-    # Closes all the frames
     cv2.destroyAllWindows()
 
 
-# playShot(FSet[1][0], FSet[1][1])
-
-# cap = cv2.VideoCapture('20020924_juve_dk_02a.mpeg')
-# cap.set(1, FSet[5][0])
-# ret, image = cap.read()
-# image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-# pil_im = Image.fromarray(image)
-
-# imSize = pil_im.size
-# x = int(imSize[0]/2)
-# y = int(imSize[1]/2)
-# imResize = pil_im.resize((x, y), Image.ANTIALIAS)
-# pil_im2 = ImageTk.PhotoImage(imResize)
-
-# myButton = Button(root, image=pil_im2)
-# myButton.pack()
-
-# root.mainloop()
-
+# create user interface to display shots
 cols = 5
 col = 0
 row = 0
@@ -223,6 +193,5 @@ for i in range(len(sets)):
         col = 0
         row += 1
 
-    # myButton.pack()
 
 root.mainloop()
